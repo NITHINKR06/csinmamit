@@ -1,0 +1,362 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);color:var(--color-text-primary)}
+.wrap{padding:1rem 0}
+.tabs{display:flex;gap:6px;margin-bottom:1.5rem;flex-wrap:wrap}
+.tab{padding:6px 14px;font-size:13px;border:.5px solid var(--color-border-secondary);border-radius:20px;cursor:pointer;background:var(--color-background-primary);color:var(--color-text-secondary);transition:all .15s}
+.tab.active{background:var(--color-text-primary);color:var(--color-background-primary);border-color:var(--color-text-primary)}
+.panel{display:none}.panel.active{display:block}
+
+/* Flow rows */
+.flow{display:flex;flex-direction:column;gap:0}
+.flow-row{display:flex;align-items:flex-start;gap:0;position:relative}
+.flow-node{flex-shrink:0;min-width:148px;max-width:148px;background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:8px;padding:10px 12px;font-size:12.5px;line-height:1.45;position:relative;z-index:1}
+.flow-node.start{background:#E6F1FB;border-color:#B5D4F4;color:#0C447C}
+.flow-node.action{background:var(--color-background-primary);border-color:var(--color-border-secondary)}
+.flow-node.decision{background:#FAEEDA;border-color:#FAC775;color:#633806}
+.flow-node.success{background:#EAF3DE;border-color:#C0DD97;color:#27500A}
+.flow-node.error{background:#FCEBEB;border-color:#F7C1C1;color:#791F1F}
+.flow-node.store{background:#EEEDFE;border-color:#CECBF6;color:#26215C}
+.flow-node b{display:block;font-weight:500;font-size:13px;margin-bottom:2px}
+.flow-node small{font-size:11px;opacity:.8}
+
+.arrow-down{width:2px;height:20px;background:var(--color-border-secondary);margin:0 auto;flex-shrink:0}
+.arrow-down-w{display:flex;justify-content:center;height:22px;align-items:center}
+.arrow-right{width:20px;height:2px;background:var(--color-border-secondary);align-self:center;flex-shrink:0}
+.arrow-label{font-size:10px;color:var(--color-text-secondary);padding:0 4px;align-self:center;white-space:nowrap}
+
+/* Section headers */
+.section-hdr{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-secondary);margin:1.5rem 0 .75rem;padding-bottom:4px;border-bottom:.5px solid var(--color-border-tertiary)}
+
+/* Grid layout for multi-column flows */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+
+/* Role badge */
+.role{display:inline-block;font-size:10px;padding:2px 7px;border-radius:3px;margin-top:4px;font-weight:500}
+.role.blue{background:#E6F1FB;color:#185FA5}
+.role.green{background:#EAF3DE;color:#3B6D11}
+.role.amber{background:#FAEEDA;color:#854F0B}
+.role.purple{background:#EEEDFE;color:#3C3489}
+
+/* Service boxes */
+.svc-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem}
+.svc{flex:1;min-width:140px;background:var(--color-background-secondary);border:.5px solid var(--color-border-tertiary);border-radius:8px;padding:10px 12px;font-size:12px}
+.svc b{display:block;font-size:13px;font-weight:500;margin-bottom:4px}
+.svc ul{padding-left:14px;color:var(--color-text-secondary);line-height:1.7}
+
+/* Firestore schema */
+.coll{margin-bottom:1rem;background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:8px;overflow:hidden}
+.coll-name{background:#EEEDFE;border-bottom:.5px solid #CECBF6;padding:6px 12px;font-size:12px;font-weight:500;color:#3C3489}
+.coll-fields{padding:8px 12px;font-size:11.5px;color:var(--color-text-secondary);line-height:1.8}
+.coll-fields span{display:inline-block;background:var(--color-background-secondary);border:.5px solid var(--color-border-tertiary);border-radius:3px;padding:0 6px;margin:1px 3px 1px 0;font-family:var(--font-mono);font-size:11px;color:var(--color-text-primary)}
+</style>
+
+<div class="wrap">
+<div class="tabs">
+  <div class="tab active" onclick="show('overview')">Overview</div>
+  <div class="tab" onclick="show('user-auth')">User Auth</div>
+  <div class="tab" onclick="show('recruit')">Recruit & Payment</div>
+  <div class="tab" onclick="show('admin')">Admin Panel</div>
+  <div class="tab" onclick="show('data')">Data & Services</div>
+</div>
+
+<!-- OVERVIEW -->
+<div class="panel active" id="panel-overview">
+  <div class="section-hdr">System overview — 5 user roles, 4 core flows</div>
+  <div class="svc-row">
+    <div class="svc">
+      <b>Public visitor</b>
+      <ul>
+        <li>Home page</li>
+        <li>Events list</li>
+        <li>Team page</li>
+        <li>Recruit/join page</li>
+      </ul>
+    </div>
+    <div class="svc">
+      <b>Regular member</b>
+      <ul>
+        <li>Google sign-in</li>
+        <li>Profile page</li>
+        <li>Membership payment</li>
+        <li>Event registration</li>
+      </ul>
+    </div>
+    <div class="svc">
+      <b>Core member</b>
+      <ul>
+        <li>Same as member</li>
+        <li>/core-profile route</li>
+        <li>Role + permissions</li>
+        <li>CoreMemberGuard</li>
+      </ul>
+    </div>
+    <div class="svc">
+      <b>Admin</b>
+      <ul>
+        <li>Google + OTP login</li>
+        <li>Dashboard, users</li>
+        <li>Events, payments</li>
+        <li>Members, settings</li>
+      </ul>
+    </div>
+  </div>
+  <div class="section-hdr">Tech stack</div>
+  <div class="svc-row">
+    <div class="svc"><b>Frontend</b><ul><li>React 18 + Vite</li><li>React Router v6</li><li>Tailwind CSS v3</li><li>Framer Motion + GSAP</li></ul></div>
+    <div class="svc"><b>Backend (BaaS)</b><ul><li>Firebase Auth (Google)</li><li>Firestore (DB)</li><li>Firebase Storage</li><li>Cloudinary (images)</li></ul></div>
+    <div class="svc"><b>External services</b><ul><li>Razorpay (payments)</li><li>Web3Forms (email)</li><li>EmailJS (unused)</li></ul></div>
+    <div class="svc"><b>Deployment</b><ul><li>Vercel (hosting)</li><li>SPA rewrites in vercel.json</li><li>Firestore rules file</li></ul></div>
+  </div>
+  <div class="section-hdr">Route map</div>
+  <div class="svc-row">
+    <div class="svc" style="min-width:200px">
+      <b>Public routes</b>
+      <ul>
+        <li>/ → Home</li>
+        <li>/events → Events</li>
+        <li>/team → Team</li>
+        <li>/recruit → Join page</li>
+        <li>/admin/login → Admin login</li>
+      </ul>
+    </div>
+    <div class="svc" style="min-width:200px">
+      <b>Protected (UserGuard)</b>
+      <ul><li>/profile → User profile</li></ul>
+      <br>
+      <b>Protected (CoreMemberGuard)</b>
+      <ul><li>/core-profile → Core dashboard</li></ul>
+    </div>
+    <div class="svc" style="min-width:200px">
+      <b>Admin (AdminGuard)</b>
+      <ul>
+        <li>/admin → Dashboard</li>
+        <li>/admin/users</li>
+        <li>/admin/events</li>
+        <li>/admin/members</li>
+        <li>/admin/payments</li>
+        <li>/admin/settings</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- USER AUTH -->
+<div class="panel" id="panel-user-auth">
+  <div class="section-hdr">Regular user sign-in flow</div>
+  <div class="flow">
+    <div class="flow-node start"><b>User clicks "Sign In"</b><small>Navbar button</small></div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-node action"><b>signInWithPopup()</b><small>Google OAuth popup</small></div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-node decision"><b>Popup blocked?</b><small>COOP header / mobile</small></div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-row" style="gap:16px">
+      <div>
+        <div class="flow-node success"><b>Popup succeeds</b><small>result.user available</small></div>
+      </div>
+      <div style="align-self:center;color:var(--color-text-secondary);font-size:12px;padding:0 4px">or</div>
+      <div>
+        <div class="flow-node action"><b>signInWithRedirect()</b><small>Page reloads → getRedirectResult()</small></div>
+      </div>
+    </div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-node decision"><b>User doc in Firestore?</b><small>users/{uid}</small></div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-row" style="gap:16px">
+      <div>
+        <div class="flow-node action"><b>New user</b><small>setDoc() with role, profile skeleton, membership: inactive</small></div>
+      </div>
+      <div style="align-self:center;color:var(--color-text-secondary);font-size:12px;padding:0 4px">or</div>
+      <div>
+        <div class="flow-node action"><b>Existing user</b><small>Read doc, check if role needs upgrading</small></div>
+      </div>
+    </div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-node decision"><b>Email in CORE_MEMBERS?</b><small>constants/coreMembers.js fallback</small></div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-row" style="gap:16px">
+      <div>
+        <div class="flow-node success"><b>role: "coreMember"</b><br><span class="role purple">CoreMemberGuard passes</span><br><span class="role green">→ /core-profile</span></div>
+      </div>
+      <div style="align-self:center;color:var(--color-text-secondary);font-size:12px;padding:0 4px">or</div>
+      <div>
+        <div class="flow-node action"><b>role: "member"</b><br><span class="role blue">Regular member</span><br><span class="role amber">→ /profile only</span></div>
+      </div>
+    </div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-node store"><b>setUser() in AuthContext</b><small>All components read from useAuth()</small></div>
+  </div>
+
+  <div class="section-hdr" style="margin-top:1.5rem">Guard logic</div>
+  <div class="svc-row">
+    <div class="svc">
+      <b>UserGuard</b>
+      <ul><li>Checks user !== null</li><li>Redirects to / if not signed in</li><li>Wraps /profile route</li></ul>
+    </div>
+    <div class="svc">
+      <b>CoreMemberGuard</b>
+      <ul><li>Checks user.role === "coreMember"</li><li>Shows "Access Restricted" page</li><li>Optional permission check</li></ul>
+    </div>
+    <div class="svc">
+      <b>AdminGuard</b>
+      <ul><li>Reads adminUser from AdminAuthContext</li><li>Redirects to /admin/login</li><li>Separate from regular auth</li></ul>
+    </div>
+  </div>
+</div>
+
+<!-- RECRUIT & PAYMENT -->
+<div class="panel" id="panel-recruit">
+  <div class="section-hdr">Recruitment & membership payment flow</div>
+  <div class="flow">
+    <div class="flow-node start"><b>User visits /recruit</b><small>Public page</small></div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-node action"><b>Chooses membership plan</b><small>1-year / 2-year options (membershipData.js)</small></div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-node decision"><b>Signed in?</b></div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-row" style="gap:16px">
+      <div>
+        <div class="flow-node error"><b>No</b><small>toast "Please sign in" — form blocked</small></div>
+      </div>
+      <div style="align-self:center;font-size:12px;color:var(--color-text-secondary)">or</div>
+      <div>
+        <div class="flow-node success"><b>Yes</b><small>Form pre-filled with user profile data</small></div>
+      </div>
+    </div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-node action"><b>Fills registration form</b><small>name, USN, branch, year, phone, email, "why join CSI"</small></div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-node action"><b>validatePaymentData()</b><small>paymentService.js — validates all fields, checks plan exists</small></div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-node action"><b>checkRateLimit(userId)</b><small>Max 3 attempts per 5 min (in-memory Map)</small></div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-node action"><b>loadRazorpayScript()</b><small>Dynamically injects checkout.razorpay.com/v1/checkout.js</small></div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-node action"><b>Razorpay popup opens</b><small>Key ID from VITE_RAZORPAY_KEY_ID, amount from plan</small></div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-node decision"><b>Payment result</b></div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-row" style="gap:16px">
+      <div>
+        <div class="flow-node error"><b>Failed / dismissed</b><small>toast error, no Firestore write</small></div>
+      </div>
+      <div style="align-self:center;font-size:12px;color:var(--color-text-secondary)">or</div>
+      <div>
+        <div class="flow-node success"><b>Payment success</b><small>razorpay_payment_id returned</small></div>
+      </div>
+    </div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-node store"><b>Write to Firestore: recruits/{docId}</b><small>name, USN, branch, plan, paymentStatus: "completed", paymentId, orderId</small></div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-node store"><b>Update users/{uid}.membership</b><small>status: "active", type: plan, expiresAt calculated</small></div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-node success"><b>Toast success + redirect to /profile</b></div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="panel" id="panel-admin">
+  <div class="section-hdr">Admin login (2-step: Google + token)</div>
+  <div class="flow">
+    <div class="flow-node start"><b>Visit /admin/login</b></div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-node action"><b>Step 1: Sign in with Google</b><small>signInAdminWithGoogle() — popup first, redirect fallback</small></div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-node decision"><b>Email in VITE_ADMIN_WHITELIST?</b><small>comma-separated env var. If empty → ALL pass (bug!)</small></div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-row" style="gap:16px">
+      <div><div class="flow-node error"><b>Not whitelisted</b><small>signOut(), toast "Unauthorized"</small></div></div>
+      <div style="align-self:center;font-size:12px;color:var(--color-text-secondary)">or</div>
+      <div><div class="flow-node success"><b>Whitelisted</b><small>Store in sessionStorage as pendingAdmin</small></div></div>
+    </div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-node action"><b>sendOTPEmail() via Web3Forms</b><small>Sends ADMIN_LOGIN_TOKEN (static!) to admin email</small></div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-node action"><b>Step 2: Admin enters token</b><small>6-digit input field, max 3 attempts</small></div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-node decision"><b>inputToken === ADMIN_LOGIN_TOKEN?</b></div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-row" style="gap:16px">
+      <div><div class="flow-node error"><b>Wrong token</b><small>attempts++, toast error</small></div></div>
+      <div style="align-self:center;font-size:12px;color:var(--color-text-secondary)">or</div>
+      <div><div class="flow-node success"><b>Correct</b><small>setAdminUser(), save to localStorage (15 min expiry)</small></div></div>
+    </div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-node store"><b>Write to Firestore: admins/{uid}</b><small>role:"admin", verified:true, lastLogin</small></div>
+    <div class="arrow-down-w"><div class="arrow-down"></div></div>
+    <div class="flow-node success"><b>Navigate to /admin/dashboard</b></div>
+  </div>
+
+  <div class="section-hdr" style="margin-top:1.5rem">Admin panel sections</div>
+  <div class="svc-row">
+    <div class="svc"><b>Dashboard</b><ul><li>Total users count</li><li>Active members</li><li>Recent signups</li><li>Recent events</li></ul></div>
+    <div class="svc"><b>Users</b><ul><li>All users table</li><li>Search + filter</li><li>View/edit profiles</li><li>Role management</li></ul></div>
+    <div class="svc"><b>Events</b><ul><li>List all events</li><li>Create / edit / delete</li><li>Cloudinary image upload</li><li>Publish toggle</li></ul></div>
+    <div class="svc"><b>Members</b><ul><li>Core member list</li><li>Add/remove roles</li><li>Branch filter</li><li>Pagination</li></ul></div>
+    <div class="svc"><b>Payments</b><ul><li>All recruit payments</li><li>OTP verification for ops</li><li>Payment stats</li><li>Export data</li></ul></div>
+    <div class="svc"><b>Settings</b><ul><li>Session timeout config</li><li>Security toggles</li><li>Right-click / select block</li><li>Saved to localStorage</li></ul></div>
+  </div>
+</div>
+
+<!-- DATA & SERVICES -->
+<div class="panel" id="panel-data">
+  <div class="section-hdr">Firestore collections</div>
+  <div class="grid2">
+    <div>
+      <div class="coll"><div class="coll-name">users / {uid}</div><div class="coll-fields"><span>uid</span><span>email</span><span>name</span><span>photoURL</span><span>role</span><span>roleDetails</span><span>isCoreMember</span><span>membership.status</span><span>membership.type</span><span>membership.expiresAt</span><span>profile.branch</span><span>profile.year</span><span>usn</span><span>phone</span><span>github</span><span>linkedin</span><span>joinedAt</span></div></div>
+      <div class="coll"><div class="coll-name">events / {eventId}</div><div class="coll-fields"><span>title</span><span>description</span><span>date</span><span>type</span><span>imageUrl</span><span>published</span><span>year</span><span>createdAt</span><span>registrations</span></div></div>
+      <div class="coll"><div class="coll-name">admins / {uid}</div><div class="coll-fields"><span>uid</span><span>email</span><span>name</span><span>role:"admin"</span><span>verified</span><span>lastLogin</span></div></div>
+    </div>
+    <div>
+      <div class="coll"><div class="coll-name">recruits / {docId}</div><div class="coll-fields"><span>name</span><span>usn</span><span>branch</span><span>yearOfStudy</span><span>mobileNumber</span><span>personalEmail</span><span>collegeEmail</span><span>membershipPlan</span><span>csiIdea</span><span>paymentStatus</span><span>paymentId</span><span>orderId</span><span>createdAt</span></div></div>
+      <div class="coll"><div class="coll-name">eventRegistrations / {regId}</div><div class="coll-fields"><span>eventId</span><span>userId</span><span>registrationType</span><span>teamCode</span><span>members</span><span>registeredAt</span><span>status</span></div></div>
+      <div class="coll"><div class="coll-name">adminOTPs / {email}</div><div class="coll-fields"><span>otp (hashed)</span><span>email</span><span>expiryTime</span><span>used</span><span>attempts</span></div></div>
+      <div class="coll"><div class="coll-name">adminActivity / {docId}</div><div class="coll-fields"><span>adminId</span><span>adminEmail</span><span>action</span><span>details</span><span>timestamp</span></div></div>
+    </div>
+  </div>
+
+  <div class="section-hdr">External service flows</div>
+  <div class="svc-row">
+    <div class="svc">
+      <b>Cloudinary (image upload)</b>
+      <ul>
+        <li>Used by admin EventForm</li>
+        <li>Unsigned upload via preset</li>
+        <li>VITE_CLOUDINARY_CLOUD_NAME</li>
+        <li>VITE_CLOUDINARY_UPLOAD_PRESET</li>
+        <li>Returns hosted image URL → stored in event.imageUrl</li>
+      </ul>
+    </div>
+    <div class="svc">
+      <b>Razorpay (payments)</b>
+      <ul>
+        <li>Client-side only (no backend order API)</li>
+        <li>VITE_RAZORPAY_KEY_ID used in checkout</li>
+        <li>Payment verified only by presence of payment_id</li>
+        <li>No server-side signature check</li>
+      </ul>
+    </div>
+    <div class="svc">
+      <b>Web3Forms (email)</b>
+      <ul>
+        <li>Used only for admin login token email</li>
+        <li>VITE_WEB3FORMS_ACCESS_KEY required</li>
+        <li>POST to api.web3forms.com/submit</li>
+        <li>Sends static ADMIN_LOGIN_TOKEN in body</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+function show(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
