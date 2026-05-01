@@ -89,21 +89,23 @@ service cloud.firestore {
                      isOwner(userId) ||
                      isAdmin()
                    );
-      // Allow an authenticated user to create their own user doc;
-      // keep validation path too for compatibility
-      allow create: if (isAuthenticated() && request.auth.uid == userId) ||
-                     (isAuthenticated() && isValidUserData(request.resource.data));
+      // Create requires auth, matching uid, AND data validation
+      allow create: if isAuthenticated() && request.auth.uid == userId && isValidUserData(request.resource.data);
       allow update: if isAuthenticated() && (isOwner(userId) || isAdmin()) && (
         isValidUserUpdate(request.resource.data, resource.data) ||
         isRelaxedUserProfileUpdate(request.resource.data, resource.data)
       );
       allow delete: if isAuthenticated() && (isOwner(userId) || isAdmin());
-      
-      // Temporary: More permissive rule for debugging - uncomment to test
-      // allow update: if isAuthenticated();
+
+      // Elevated roles that normal users cannot set on themselves
+      function isElevatedRole(role) {
+        return role in ['admin', 'coreMember', 'EXECUTIVE MEMBER', 'core'];
+      }
 
       // Validate user data structure and content
       function isValidUserData(data) {
+        // Role: only allow 'member' or 'User' from non-admin users
+        // Elevated roles (admin, coreMember, EXECUTIVE MEMBER, core) require admin authorization
         return (data.uid == null || data.uid is string) &&
                (data.name == null || data.name == "" || isValidStringLength(data.name, 1, 100)) &&
                (data.email == null || data.email == "" || isValidEmail(data.email)) &&
@@ -114,11 +116,15 @@ service cloud.firestore {
                (data.github == null || data.github == "" || isValidURL(data.github, 200)) &&
                (data.linkedin == null || data.linkedin == "" || isValidURL(data.linkedin, 200)) &&
                (data.phone == null || data.phone == "" || isValidPhone(data.phone)) &&
+               // Role authorization: non-elevated always ok; elevated requires admin
+               (data.role == null || !isElevatedRole(data.role) || isAdmin()) &&
                (data.role == null || data.role in ['member', 'coreMember', 'admin', 'User', 'EXECUTIVE MEMBER', 'core']) &&
-               (data.roleDetails == null || isValidRoleDetails(data.roleDetails)) &&
+               // roleDetails: only admins can set this (core member roles managed by admins)
+               (data.roleDetails == null || isAdmin()) &&
                (data.isCoreMember == null || data.isCoreMember is bool) &&
                (data.joinedAt == null || data.joinedAt is timestamp) &&
-               (data.membership == null || isValidMembershipData(data.membership)) &&
+               // membership: only admins can set this (set by backend webhook)
+               (data.membership == null || isAdmin()) &&
                (data.certificates == null || data.certificates is list) &&
                (data.profile == null || isValidProfileData(data.profile)) &&
                (data.year == null || data.year == "" || data.year is number) &&
@@ -143,7 +149,6 @@ service cloud.firestore {
       }
       
       function isValidProfileData(profile) {
-        // Support nested profile fields used by core-profile UI
         return (profile.phone == null || profile.phone == "" || isValidPhone(profile.phone)) &&
                (profile.college == null || profile.college == "" || isValidStringLength(profile.college, 0, 100)) &&
                (profile.branch == null || profile.branch == "" || isValidStringLength(profile.branch, 0, 100)) &&
@@ -153,24 +158,21 @@ service cloud.firestore {
                (profile.linkedin == null || profile.linkedin == "" || isValidURL(profile.linkedin, 200)) &&
                (profile.github == null || profile.github == "" || isValidURL(profile.github, 200)) &&
                (profile.skills == null || profile.skills is list) &&
-               // image history is appended when uploading photos
                (profile.imageHistory == null || profile.imageHistory is list);
       }
       
       function isValidUserUpdate(newData, oldData) {
         return isValidUserData(newData) &&
-               // createdAt must not change; allow omitting it in updates
                (!(newData.keys().hasAny(['createdAt'])) || newData.createdAt == oldData.createdAt);
       }
 
       // Allow common profile edits without requiring the entire user schema
       function isRelaxedUserProfileUpdate(newData, oldData) {
-        // Only these fields can be updated in relaxed path
+        // Only non-privileged fields; role, roleDetails, membership are not allowed here
         return newData.diff(oldData).affectedKeys().hasOnly([
                 'name','bio','branch','usn','github','linkedin','phone','year',
-                'profile','updatedAt','photoURL','certificates','email','roleDetails'
+                'profile','updatedAt','photoURL','certificates','email'
                ]) &&
-               // Keep createdAt immutable
                (!(newData.keys().hasAny(['createdAt'])) || newData.createdAt == oldData.createdAt);
       }
     }

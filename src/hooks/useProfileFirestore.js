@@ -125,14 +125,6 @@ export const useProfileFirestore = () => {
       return false
     }
 
-    // Debug: Log authentication state
-    console.log('User authentication state:', {
-      uid: user.uid,
-      email: user.email,
-      name: user.name,
-      isAuthenticated: !!user.uid
-    })
-
     const isValid = validateProfileData(profileData);
     if (!isValid) {
       return false; // Stop execution if validation fails
@@ -145,9 +137,6 @@ export const useProfileFirestore = () => {
       const existingDoc = await getDoc(userRef);
       const existingData = existingDoc.exists() ? existingDoc.data() : {};
 
-      const validRoles = ['member', 'coreMember', 'admin', 'User', 'EXECUTIVE MEMBER', 'core'];
-
-      // Prepare the update data according to Firestore rules
       // Prepare the update data according to Firestore rules
       const updateData = {
         // Core fields that match Firestore rules
@@ -159,14 +148,13 @@ export const useProfileFirestore = () => {
         linkedin: profileData.linkedin || '',
         phone: profileData.phone || '',
 
-        // --- ADD THIS LINE ---
         year: getYearAsNumber(profileData.year), // This satisfies the 'number' rule
 
         // Preserve existing fields
         email: existingData.email || user.email || profileData.email,
 
-        // --- THIS IS THE CORRECTED LINE ---
-        role: validRoles.includes(existingData.role) ? existingData.role : 'member',
+        // Role is NOT included — can only be set by admin/webhook
+        // This prevents normal users from escalating via profile save
 
         certificates: existingData.certificates || [],
 
@@ -187,9 +175,6 @@ export const useProfileFirestore = () => {
       if (!existingDoc.exists()) {
         updateData.createdAt = serverTimestamp()
       }
-
-      // Debug: Log the data being sent
-      console.log('Sending data to Firestore:', updateData)
 
       // Update Firestore document and local state via AuthContext
       const success = await updateUserProfile(updateData)
