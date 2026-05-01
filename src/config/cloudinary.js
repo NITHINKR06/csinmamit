@@ -2,8 +2,7 @@
 export const cloudinaryConfig = {
   cloudName: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'dqnlrrcgb',
   uploadPreset: import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'csi-events',
-  apiKey: import.meta.env.VITE_CLOUDINARY_API_KEY,
-  apiSecret: import.meta.env.VITE_CLOUDINARY_API_SECRET
+  apiKey: import.meta.env.VITE_CLOUDINARY_API_KEY
 }
 
 // Validate Cloudinary configuration

@@ -332,6 +332,14 @@ const isValidPhone = (phone) => {
  * @param {Array} events - Array of events to export
  * @returns {string} - CSV string
  */
+const sanitizeCSVField = (value) => {
+  const str = String(value);
+  if (['=', '+', '-', '@', '\t', '\n', '\r'].includes(str.charAt(0))) {
+    return "'" + str;
+  }
+  return str.replace(/"/g, '""');
+};
+
 export const exportEventsToCSV = (events) => {
   const headers = [
     'Title',
@@ -371,7 +379,7 @@ export const exportEventsToCSV = (events) => {
 
   const csvContent = [
     headers.join(','),
-    ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ...rows.map(row => row.map(cell => `"${sanitizeCSVField(cell)}"`).join(','))
   ].join('\n')
 
   return csvContent

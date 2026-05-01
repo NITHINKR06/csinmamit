@@ -86,47 +86,8 @@ const SecurityHeaders = ({ children }) => {
     }
   }, [location])
 
-  // Add security-related meta tags
-  useEffect(() => {
-    let adminSettings = {}
-    try {
-      const saved = localStorage.getItem('adminSettings')
-      adminSettings = saved ? JSON.parse(saved) : {}
-    } catch { }
-
-    // Add CSP meta tag (Note: frame-ancestors cannot be set via meta tag, only via HTTP headers)
-    const cspMeta = document.createElement('meta')
-    cspMeta.httpEquiv = 'Content-Security-Policy'
-
-    // Get backend API URL from environment variables
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || ''
-    const apiUrlForCSP = apiBaseUrl ? ` ${apiBaseUrl}` : ''
-
-    const STANDARD_CSP = `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://accounts.google.com https://checkout.razorpay.com https://*.firebaseapp.com; style-src 'self' 'unsafe-inline' https://accounts.google.com; img-src 'self' data: https: blob:; connect-src 'self' https://api.emailjs.com https://api.razorpay.com https://checkout.razorpay.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://accounts.google.com https://*.googleapis.com https://api.cloudinary.com https://res.cloudinary.com https://api.web3forms.com${apiUrlForCSP}; frame-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://accounts.google.com https://*.firebaseapp.com https://*.firebaseauth.com; font-src 'self' data:;`
-    const STRICT_CSP = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-src 'self'; font-src 'self' data:;"
-
-    cspMeta.content = adminSettings.cspLevel === 'strict' ? STRICT_CSP : STANDARD_CSP
-    document.head.appendChild(cspMeta)
-
-    // Add X-Content-Type-Options
-    const xcontentMeta = document.createElement('meta')
-    xcontentMeta.httpEquiv = 'X-Content-Type-Options'
-    xcontentMeta.content = 'nosniff'
-    document.head.appendChild(xcontentMeta)
-
-    // Add Referrer-Policy to minimize referrer leakage
-    const referrerMeta = document.createElement('meta')
-    referrerMeta.name = 'referrer'
-    referrerMeta.content = 'no-referrer'
-    document.head.appendChild(referrerMeta)
-
-    // Cleanup
-    return () => {
-      if (cspMeta.parentNode) cspMeta.parentNode.removeChild(cspMeta)
-      if (xcontentMeta.parentNode) xcontentMeta.parentNode.removeChild(xcontentMeta)
-      if (referrerMeta.parentNode) referrerMeta.parentNode.removeChild(referrerMeta)
-    }
-  }, [location])
+  // Security headers are set via Vercel HTTP headers (vercel.json)
+  // CSP, X-Frame-Options, etc. are handled server-side for reliability
 
   return children
 }

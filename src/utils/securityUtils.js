@@ -16,13 +16,19 @@ export const sanitizeInput = (input) => {
     .replace(/=/g, '&#x3D;');
 };
 
-// Validate and sanitize form data
+// Validate and sanitize form data (recursive)
 export const sanitizeFormData = (formData) => {
   const sanitized = {};
 
   for (const [key, value] of Object.entries(formData)) {
     if (typeof value === 'string') {
       sanitized[key] = sanitizeInput(value);
+    } else if (Array.isArray(value)) {
+      sanitized[key] = value.map(item =>
+        typeof item === 'string' ? sanitizeInput(item) : item
+      );
+    } else if (value && typeof value === 'object') {
+      sanitized[key] = sanitizeFormData(value);
     } else {
       sanitized[key] = value;
     }
@@ -39,27 +45,26 @@ export const validatePaymentAmount = (amount, expectedAmount) => {
 // Generate secure transaction ID
 export const generateTransactionId = () => {
   const timestamp = Date.now();
-  const random = Math.random().toString(36).substring(2, 15);
-  const random2 = Math.random().toString(36).substring(2, 15);
-  return `CSI_${timestamp}_${random}${random2}`;
+  const array = new Uint32Array(4);
+  crypto.getRandomValues(array);
+  const random = Array.from(array, b => b.toString(36)).join('');
+  return `CSI_${timestamp}_${random}`;
 };
 
-// Encrypt sensitive data (for client-side temporary storage only)
+// Encode data for temporary storage (NOT encryption - only obfuscation)
 export const encodeData = (data) => {
   try {
     return btoa(JSON.stringify(data));
   } catch (error) {
-    // console.error('Encoding error:', error);
     return null;
   }
 };
 
-// Decrypt sensitive data
+// Decode data from temporary storage
 export const decodeData = (encodedData) => {
   try {
     return JSON.parse(atob(encodedData));
   } catch (error) {
-    // console.error('Decoding error:', error);
     return null;
   }
 };

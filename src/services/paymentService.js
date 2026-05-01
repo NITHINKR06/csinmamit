@@ -9,6 +9,12 @@ import {
   sanitizeFormData
 } from '../utils/securityUtils'
 import { membershipPlans } from '../data/membershipData'
+import { auth } from '../config/firebase'
+
+const getFirebaseAuthToken = async () => {
+  if (!auth?.currentUser) throw new Error('Not authenticated')
+  return await auth.currentUser.getIdToken()
+}
 
 class PaymentService {
   constructor() {
@@ -106,36 +112,31 @@ class PaymentService {
       // Generate secure transaction ID
       const transactionId = generateTransactionId()
 
-      // In production, this should be an API call to your backend
-      if (this.apiBaseUrl) {
-        const response = await fetch(`${this.apiBaseUrl}/create-order`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Request-ID': transactionId
-          },
-          body: JSON.stringify({
-            userId,
-            planId,
-            amount: plan.price,
-            formData: sanitizedData,
-            transactionId
-          })
+      if (!this.apiBaseUrl) {
+        throw new Error('Payment backend not configured. Please set VITE_API_BASE_URL.')
+      }
+
+      const idToken = await getFirebaseAuthToken()
+      const response = await fetch(`${this.apiBaseUrl}/create-order`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`,
+          'X-Request-ID': transactionId
+        },
+        body: JSON.stringify({
+          userId,
+          planId,
+          transactionId
         })
+      })
 
-        if (!response.ok) {
-          throw new Error('Failed to create payment order')
-        }
-
-        return await response.json()
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}))
+        throw new Error(err.error || 'Failed to create payment order')
       }
 
-      return {
-        orderId: `order_${transactionId}`,
-        amount: plan.price * 100, // Amount in paise
-        currency: 'INR',
-        transactionId
-      }
+      return await response.json()
     } catch (error) {
       // console.error('Order creation error:', error)
       throw error
@@ -203,38 +204,36 @@ class PaymentService {
    */
   async verifyPayment(paymentResponse, transactionId, onSuccess) {
     try {
-      if (this.apiBaseUrl) {
-        // Production: Verify on backend
-        const response = await fetch(`${this.apiBaseUrl}/verify-payment`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Transaction-ID': transactionId
-          },
-          body: JSON.stringify({
-            razorpay_payment_id: paymentResponse.razorpay_payment_id,
-            razorpay_order_id: paymentResponse.razorpay_order_id,
-            razorpay_signature: paymentResponse.razorpay_signature,
-            transactionId
-          })
-        })
+      if (!this.apiBaseUrl) {
+        throw new Error('Payment backend not configured')
+      }
 
-        if (!response.ok) {
-          throw new Error('Payment verification failed')
-        }
-
-        const result = await response.json()
-        if (result.verified) {
-          onSuccess(result)
-        } else {
-          throw new Error('Payment verification failed')
-        }
-      } else {
-        // console.warn('Payment verification should be done on backend')
-        onSuccess({
-          paymentId: paymentResponse.razorpay_payment_id,
+      const idToken = await getFirebaseAuthToken()
+      const response = await fetch(`${this.apiBaseUrl}/verify-payment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`,
+          'X-Transaction-ID': transactionId
+        },
+        body: JSON.stringify({
+          razorpay_payment_id: paymentResponse.razorpay_payment_id,
+          razorpay_order_id: paymentResponse.razorpay_order_id,
+          razorpay_signature: paymentResponse.razorpay_signature,
           transactionId
         })
+      })
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}))
+        throw new Error(err.error || 'Payment verification failed')
+      }
+
+      const result = await response.json()
+      if (result.verified) {
+        onSuccess(result)
+      } else {
+        throw new Error('Payment verification failed')
       }
     } catch (error) {
       // console.error('Payment verification error:', error)

@@ -393,41 +393,52 @@ export const AdminAuthProvider = ({ children }) => {
     toast.success(`Session extended by ${Math.floor(durationMs / 60000)} minutes`)
   }
 
-  // Check for existing session on mount
+  // Check for existing session on mount with Firebase Auth verification
   useEffect(() => {
     const checkExistingSession = async () => {
-      // Always require a valid session; no dev auto-login
-
       const storedSession = localStorage.getItem('adminSession')
-      
+
       if (storedSession) {
         const session = JSON.parse(storedSession)
-        
+
         if (Date.now() < session.expiry) {
-          // Session still valid, restore admin user
-          const adminData = await checkAdminStatus(session.uid)
-          if (adminData) {
-            setAdminUser(adminData)
-            setSessionExpiry(session.expiry)
-          } else {
+          try {
+            // Verify Firebase Auth is still valid by checking the current user
+            const currentUser = auth.currentUser
+            if (currentUser && currentUser.uid === session.uid) {
+              const tokenResult = await currentUser.getIdTokenResult(true)
+              if (tokenResult) {
+                const adminData = await checkAdminStatus(session.uid)
+                if (adminData) {
+                  setAdminUser(adminData)
+                  setSessionExpiry(session.expiry)
+                } else {
+                  localStorage.removeItem('adminSession')
+                }
+              } else {
+                localStorage.removeItem('adminSession')
+              }
+            } else {
+              localStorage.removeItem('adminSession')
+            }
+          } catch {
             localStorage.removeItem('adminSession')
           }
         } else {
           localStorage.removeItem('adminSession')
         }
       }
-      
+
       setLoading(false)
     }
 
     checkExistingSession()
-  }, [])
+  }, [auth, checkAdminStatus])
 
   // Listen to auth state changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser && adminUser) {
-        // Keep admin user in sync
         const adminData = await checkAdminStatus(firebaseUser.uid)
         if (adminData) {
           setAdminUser({
@@ -436,18 +447,18 @@ export const AdminAuthProvider = ({ children }) => {
           })
         }
       } else if (firebaseUser && !adminUser) {
-        // Check if this user is an admin
         const adminData = await checkAdminStatus(firebaseUser.uid)
         if (adminData) {
-          // This is an admin user, but we don't have admin session
-          // Don't set admin user without proper session
-          // console.log('Admin user detected but no active session')
+          const storedSession = localStorage.getItem('adminSession')
+          if (!storedSession || Date.now() > JSON.parse(storedSession).expiry) {
+            logoutAdmin()
+          }
         }
       }
     })
 
     return unsubscribe
-  }, [])
+  }, [adminUser, auth, onAuthStateChanged, checkAdminStatus])
 
   // Activity logging
   const logAdminActivity = async (action, details = {}) => {
@@ -461,7 +472,7 @@ export const AdminAuthProvider = ({ children }) => {
         action: action,
         details: details,
         timestamp: serverTimestamp(),
-        ip: window.location.hostname // In production, get actual IP
+        ip: '' // IP is not accessible client-side; use server-side logging
       })
     } catch (error) {
       // console.error('Error logging activity:', error)

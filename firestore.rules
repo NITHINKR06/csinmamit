@@ -81,12 +81,14 @@ service cloud.firestore {
     }
     
     match /users/{userId} {
-      // Allow public read for core members (team page display)
+      // Allow authenticated read for core members (team page display)
       // Otherwise, only owners and admins can read
-      allow read: if resource.data.role == 'coreMember' || 
+      allow read: if isAuthenticated() && (
+                     resource.data.role == 'coreMember' ||
                      resource.data.isCoreMember == true ||
-                     isOwner(userId) || 
-                     isAdmin();
+                     isOwner(userId) ||
+                     isAdmin()
+                   );
       // Allow an authenticated user to create their own user doc;
       // keep validation path too for compatibility
       allow create: if (isAuthenticated() && request.auth.uid == userId) ||
@@ -420,18 +422,26 @@ service cloud.firestore {
     // ============================================================================
     
     match /recruits/{document=**} {
-      // Authenticated users can read recruit data
-      allow read: if isAuthenticated();
+      // Owner or admin can read recruit data
+      allow read: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid ||
+        isAdmin()
+      );
       
-      // Authenticated users can create recruit applications
-      allow create: if isAuthenticated() && isValidRecruitData(request.resource.data);
+      // Authenticated users can create recruit applications (must be their own)
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid &&
+        isValidRecruitData(request.resource.data);
       
       // Only admins can update recruit data (for processing applications)
       allow update: if isAdmin() && 
         isValidRecruitUpdate(request.resource.data, resource.data);
       
-      // Authenticated users can delete recruit data
-      allow delete: if isAuthenticated();
+      // Only owner or admin can delete recruit data
+      allow delete: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid ||
+        isAdmin()
+      );
       
       function isValidRecruitData(data) {
         return data.keys().hasOnly(['name', 'dateOfBirth', 'usn', 'yearOfStudy', 'branch', 'mobileNumber', 'personalEmail', 'collegeEmail', 'membershipPlan', 'csiIdea', 'paymentStatus', 'paymentId', 'orderId', 'createdAt', 'updatedAt']) &&
@@ -503,23 +513,17 @@ service cloud.firestore {
     // Allow authenticated users to create/update OTP for their own email (during login flow)
     // Keep reads restricted to the same email or admins
     match /adminOTPs/{email} {
-      allow create: if true;
-      allow update: if isAuthenticated() && request.auth.token.email == email;
-      allow read: if isAdmin() || (isAuthenticated() && request.auth.token.email == email);
+      allow create: if isAuthenticated();
+      allow read, update: if isAuthenticated() && request.auth.token.email == email;
       allow delete: if isAdmin();
     }
     
     match /adminOTPs/{otpId} {
-      allow create: if true;
+      allow create: if isAuthenticated();
 
-      // Allow UPDATE if:
-      // 1. User is authenticated and matches the email (original rule for potential future use cases)
-      // OR
-      // 2. The update is ONLY changing the 'used' or 'attempts' fields (allowing the verifyOTP function to complete)
-      allow update: if (isAuthenticated() && request.auth.token.email == resource.data.email) ||
-                       (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['used', 'attempts']));
+      allow update: if isAuthenticated() && request.auth.token.email == resource.data.email &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['used', 'attempts', 'updatedAt']);
 
-      // Allow read if user is admin OR authenticated AND their email matches the 'email' field inside the document
       allow read: if isAdmin() || (isAuthenticated() && request.auth.token.email == resource.data.email);
 
       allow delete: if isAdmin();
