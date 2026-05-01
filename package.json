@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "export:student-team": "node ./scripts/exportStudentTeam.mjs"
+    "export:student-team": "node ./scripts/exportStudentTeam.mjs",
+    "export:core-members": "node ./scripts/exportCoreMembers.mjs"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",

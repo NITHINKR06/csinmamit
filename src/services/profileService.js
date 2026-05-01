@@ -14,32 +14,24 @@ export const uploadProfileImage = async (userId, imageFile) => {
     throw new Error('User ID and image file are required')
   }
 
-  try {
-    // Upload to Cloudinary
-    const uploadResult = await uploadToCloudinary(imageFile, 'csi-profiles')
-
-    if (!uploadResult.secure_url) {
-      throw new Error('Failed to get image URL from Cloudinary')
-    }
-
-    // Store upload history in user document
-    const userRef = doc(db, 'users', userId)
-    await updateDoc(userRef, {
-      photoURL: uploadResult.secure_url,
-      'profile.imageHistory': arrayUnion({
-        url: uploadResult.secure_url,
-        publicId: uploadResult.public_id,
-        uploadedAt: new Date().toISOString(),
-        format: uploadResult.format,
-        size: uploadResult.bytes
-      })
-    })
-
-    return uploadResult.secure_url
-  } catch (error) {
-    console.error('Error uploading profile image:', error)
-    throw error
+  const uploadResult = await uploadToCloudinary(imageFile, 'csi-profiles')
+  if (!uploadResult.secure_url) {
+    throw new Error('Failed to get image URL from Cloudinary')
   }
+
+  const userRef = doc(db, 'users', userId)
+  await updateDoc(userRef, {
+    photoURL: uploadResult.secure_url,
+    'profile.imageHistory': arrayUnion({
+      url: uploadResult.secure_url,
+      publicId: uploadResult.public_id,
+      uploadedAt: new Date().toISOString(),
+      format: uploadResult.format,
+      size: uploadResult.bytes
+    })
+  })
+
+  return uploadResult.secure_url
 }
 
 /**
@@ -49,39 +41,27 @@ export const uploadProfileImage = async (userId, imageFile) => {
  * @returns {Promise<boolean>} - Success status
  */
 export const updateUserProfile = async (userId, profileData) => {
-  if (!userId) {
-    throw new Error('User ID is required')
+  if (!userId) throw new Error('User ID is required')
+
+  const safeProfileData = sanitizeFormData(profileData)
+  const userRef = doc(db, 'users', userId)
+  const userDoc = await getDoc(userRef)
+
+  if (!userDoc.exists()) {
+    await setDoc(userRef, {
+      uid: userId,
+      ...safeProfileData,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    })
+  } else {
+    await updateDoc(userRef, {
+      ...safeProfileData,
+      updatedAt: serverTimestamp()
+    })
   }
 
-  try {
-    // Sanitize incoming data
-    const safeProfileData = sanitizeFormData(profileData)
-    const userRef = doc(db, 'users', userId)
-
-    // Check if user document exists
-    const userDoc = await getDoc(userRef)
-
-    if (!userDoc.exists()) {
-      // Create new document if it doesn't exist
-      await setDoc(userRef, {
-        uid: userId,
-        ...safeProfileData,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      })
-    } else {
-      // Update existing document
-      await updateDoc(userRef, {
-        ...safeProfileData,
-        updatedAt: serverTimestamp()
-      })
-    }
-
-    return true
-  } catch (error) {
-    console.error('Error updating user profile:', error)
-    throw error
-  }
+  return true
 }
 
 /**
@@ -104,7 +84,6 @@ export const getUserProfile = async (userId) => {
 
     return null
   } catch (error) {
-    console.error('Error getting user profile:', error)
     throw error
   }
 }

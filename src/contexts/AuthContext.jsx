@@ -9,8 +9,8 @@ import {
 } from 'firebase/auth'
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore'
 import { auth, googleProvider, db } from '../config/firebase'
-import { isCoreMember as isCoreMemberSecure, getRoleByEmail as getRoleByEmailSecure, isNMAMITEmail, hasPermission } from '../utils/secureCoreMembersUtils'
-import { CORE_MEMBERS } from '../constants/coreMembers'
+import { isNMAMITEmail } from '../utils/secureCoreMembersUtils'
+import { isCoreMember as checkCoreMember, getRoleByEmail as fetchRoleByEmail, hasPermission } from '../services/coreMemberService'
 import toast from 'react-hot-toast'
 
 const AuthContext = createContext({})
@@ -23,33 +23,17 @@ export const AuthProvider = ({ children }) => {
   const [authLoading, setAuthLoading] = useState(false)
   const [isProfileIncomplete, setIsProfileIncomplete] = useState(false)
 
-  // Helper function to check if user is a core member with fallback
-  const isCoreMember = (email) => {
+  // Helper function to check if user is a core member
+  // Uses Firestore coreMembers collection first, falls back to constants
+  const isCoreMember = async (email) => {
     if (!email) return false;
-
-    // First try secure method (env variables)
-    const secureCheck = isCoreMemberSecure(email);
-    if (secureCheck) {
-      return true;
-    }
-
-    // Fallback to constants file
-    const constantsCheck = CORE_MEMBERS.hasOwnProperty(email.toLowerCase());
-    return constantsCheck;
+    return await checkCoreMember(email);
   };
 
-  // Helper function to get role by email with fallback
-  const getRoleByEmail = (email) => {
+  // Helper function to get role by email
+  const getRoleByEmail = async (email) => {
     if (!email) return null;
-
-    // First try secure method (env variables)
-    const secureRole = getRoleByEmailSecure(email);
-    if (secureRole) {
-      return secureRole;
-    }
-
-    // Fallback to constants file
-    return CORE_MEMBERS[email.toLowerCase()] || null;
+    return await fetchRoleByEmail(email);
   };
 
   // Sign in with Google (popup first, fallback to redirect)
@@ -75,8 +59,8 @@ export const AuthProvider = ({ children }) => {
       const userSnap = await getDoc(userRef)
 
       // Check if user is a core member
-      const coreRoleData = getRoleByEmail(user.email)
-      const isCore = isCoreMember(user.email)
+      const coreRoleData = await getRoleByEmail(user.email)
+      const isCore = await isCoreMember(user.email)
 
       let finalUserData = null
 
@@ -224,8 +208,8 @@ export const AuthProvider = ({ children }) => {
         const userRef = doc(db, 'users', user.uid)
         const userSnap = await getDoc(userRef)
 
-        const coreRoleData = getRoleByEmail(user.email)
-        const isCore = isCoreMember(user.email)
+        const coreRoleData = await getRoleByEmail(user.email)
+        const isCore = await isCoreMember(user.email)
 
         if (!userSnap.exists()) {
           let userRole = 'member'
@@ -421,7 +405,7 @@ export const AuthProvider = ({ children }) => {
         }
 
         // Check if user is a core member and assign role
-        const coreRoleData = getRoleByEmail(firebaseUser.email)
+        const coreRoleData = await getRoleByEmail(firebaseUser.email)
         let roleDetails = null
         let userRole = userData?.role || 'member'
 

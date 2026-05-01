@@ -1,21 +1,18 @@
-import { collection, getDocs, query, where } from 'firebase/firestore'
+import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../config/firebase'
-import { CORE_MEMBERS } from '../constants/coreMembers'
+import { getCoreMembers, CORE_MEMBERS } from '../services/coreMemberService'
 import teamData from '../data/teamData.json'
 
 /**
- * Get role from CORE_MEMBERS constant or Firestore data
+ * Get role from coreMembers data or Firestore data
  * @param {Object} data - User data from Firestore
  * @returns {string} User's role
  */
 const getUserRole = (data) => {
-  // First, check if the email exists in CORE_MEMBERS constant
   const email = data.email?.toLowerCase()
   if (email && CORE_MEMBERS[email]) {
     return CORE_MEMBERS[email].role
   }
-  
-  // Fallback to Firestore data
   return data.profile?.role || data.roleDetails?.position || 'Member'
 }
 
