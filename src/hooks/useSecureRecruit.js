@@ -10,6 +10,9 @@ import {
   isValidUSN
 } from '../utils/securityUtils'
 
+const POLL_INTERVAL = 1500
+const MAX_POLL_ATTEMPTS = 12
+
 export const useSecureRecruit = () => {
   const navigate = useNavigate()
   const { user, signInWithGoogle, getUserData } = useAuth()
@@ -92,6 +95,20 @@ export const useSecureRecruit = () => {
     return true
   }
 
+  const pollMembershipStatus = async (userId) => {
+    for (let i = 0; i < MAX_POLL_ATTEMPTS; i++) {
+      await new Promise(r => setTimeout(r, POLL_INTERVAL))
+      try {
+        const freshData = await getUserData(userId)
+        if (freshData?.membership?.status === 'active') {
+          return true
+        }
+      } catch (error) {
+      }
+    }
+    return false
+  }
+
   const handlePayment = async () => {
     try {
       if (!user) {
@@ -151,10 +168,21 @@ export const useSecureRecruit = () => {
         user.uid,
         selectedPlan,
         sanitizedData,
-        (result) => {
-          toast.success('Payment successful! Welcome to CSI NMAMIT!')
+        async () => {
+          const processingToast = toast.loading('Payment confirmed! Activating your membership...')
+
+          const activated = await pollMembershipStatus(user.uid)
+
+          toast.dismiss(processingToast)
+          if (activated) {
+            toast.success('Membership activated! Welcome to CSI NMAMIT!')
+          } else {
+            toast.success('Payment successful! Your membership will be active shortly.')
+          }
+
           paymentAttempts.current = 0
-          setTimeout(() => navigate('/profile'), 2000)
+          setLoading(false)
+          navigate('/profile')
         },
         (error) => {
           toast.error(error || 'Payment failed. Please try again.')
