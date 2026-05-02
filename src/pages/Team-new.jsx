@@ -9,7 +9,7 @@ import StudentGrid from '../components/Team/StudentGrid'
 import MemberModal from '../components/Team/MemberModal'
 import { fetchAllMembers, fetchFacultyMembers } from '../services/teamService'
 import teamData from '../data/teamData.json'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 const Team = () => {
   const [activeTab, setActiveTab] = useState('students')

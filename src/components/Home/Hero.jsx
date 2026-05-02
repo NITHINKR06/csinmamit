@@ -58,7 +58,7 @@ const NoiseCanvas = () => {
   return <canvas ref={ref} className="absolute inset-0 pointer-events-none z-[1]" />
 }
 
-const CountUp = ({ end, suffix = '', duration = 2000 }) => {
+const CountUp = ({ end, suffix = '', duration = 1000 }) => {
   const [count, setCount] = useState(0)
   const ref = useRef(null)
   const [inView, setInView] = useState(false)
@@ -121,42 +121,46 @@ const Hero = () => {
         style={{ transform: `translateY(${parallaxY}px)` }}
       >
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 mb-8"
+          className="inline-flex items-center gap-3 mb-8"
         >
-          <Sparkles size={14} className="text-primary-500" />
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">CSI NMAMIT is now public!</span>
+          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+            <Sparkles size={14} className="text-primary-500" />
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">CSI NMAMIT</span>
+          </span>
+          <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/40">
+            <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 tracking-wide uppercase">Applications Open</span>
+          </span>
         </motion.div>
 
         <motion.h1
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="font-bold mb-6 leading-tight tracking-tight"
-          style={{ fontSize: 'clamp(2.6rem, 7vw, 5.5rem)' }}
+          transition={{ duration: 0.5, delay: 0.06 }}
+          className="text-display-xl font-bold mb-6 leading-tight tracking-tightest"
         >
           {user ? (
             <>Welcome back, <span className="gradient-text">{user.name}</span></>
           ) : (
-            <>Where Innovation Meets <span className="gradient-text">Technology</span></>
+            <>Where engineers{' '}<br className="hidden sm:block" />become <span className="gradient-text">builders.</span></>
           )}
         </motion.h1>
 
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-lg md:text-xl text-gray-500 dark:text-gray-400 mb-10 max-w-2xl mx-auto"
+          transition={{ duration: 0.5, delay: 0.12 }}
+          className="text-body-lg text-gray-500 dark:text-gray-400 mb-10 max-w-2xl mx-auto"
         >
-          Computer Society of India — NMAMIT chapter. Building tomorrow's tech leaders through hands-on workshops, hackathons, and innovation.
+          Computer Society of India, NMAMIT chapter. Workshops, hackathons, and a community that ships things.
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
+          transition={{ duration: 0.5, delay: 0.18 }}
           className="flex flex-col sm:flex-row gap-4 justify-center items-center"
         >
           {user ? (
@@ -182,9 +186,9 @@ const Hero = () => {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
+          transition={{ duration: 0.5, delay: 0.36 }}
           className="mt-16 grid grid-cols-3 gap-8 max-w-lg mx-auto"
         >
           {[

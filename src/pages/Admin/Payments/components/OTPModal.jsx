@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Shield, Mail, Lock, AlertCircle, RefreshCw } from 'lucide-react'
 import emailService from '../../../../services/emailService'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 export default function OTPModal({ isOpen, onClose, onSuccess, adminEmail }) {
   const [otp, setOtp] = useState(['', '', '', '', '', ''])

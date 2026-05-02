@@ -3,11 +3,12 @@
  */
 
 import { Routes, Route } from 'react-router-dom'
-import { Toaster } from 'react-hot-toast'
+import { Toaster } from 'sonner'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { AdminAuthProvider } from './contexts/AdminAuthContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import SecurityHeaders from './middleware/SecurityHeaders'
+import CommandPalette from './components/UI/CommandPalette'
 import { lazy, Suspense, useEffect, useState } from 'react'
 // import ProfileCompletionModal from './components/Profile/ProfileCompletionModal'
 
@@ -28,9 +29,6 @@ import NotFound from './pages/NotFound'
 // import CoreDashboard from './pages/CoreDashboard'
 import CoreMemberProfile from './pages/CoreMemberProfile'
 import AdminPayments from './pages/Admin/Payments/AdminPayments'
-
-// UI Demo Pages (only in development)
-// import GlitchTextDemo from './components/UI/GlitchTextDemo'
 
 // Admin Components - Lazy loaded for security and performance
 const AdminLayout = lazy(() => import('./components/Admin/AdminLayout'))
@@ -80,7 +78,9 @@ function AppContent() {
       <div className="min-h-screen bg-white dark:bg-gray-950 transition-colors duration-300">
         <Toaster
           position="bottom-right"
-          containerStyle={{ top: 80, zIndex: 9999 }}
+          theme="dark"
+          richColors
+          closeButton
           toastOptions={{
             duration: 2000,
             style: {
@@ -89,20 +89,9 @@ function AppContent() {
               borderRadius: '0.5rem',
               border: '1px solid rgba(59, 130, 246, 0.5)',
             },
-            success: {
-              iconTheme: {
-                primary: '#10b981',
-                secondary: '#fff',
-              },
-            },
-            error: {
-              iconTheme: {
-                primary: '#ef4444',
-                secondary: '#fff',
-              },
-            },
           }}
         />
+        <CommandPalette />
         
         <Routes>
           {/* Public Routes */}
@@ -112,10 +101,6 @@ function AppContent() {
             <Route path="team" element={<Team />} />
             <Route path="recruit" element={<Recruit />} />
             
-            {/* Demo Routes (only in development) */}
-            {/* {import.meta.env.DEV && (
-              <Route path="demo/glitch-text" element={<GlitchTextDemo />} />
-            )} */}
             
             <Route path="*" element={<NotFound />} />
           </Route>

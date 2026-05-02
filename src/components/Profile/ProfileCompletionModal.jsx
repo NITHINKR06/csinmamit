@@ -13,7 +13,7 @@ import {
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../../config/firebase'
 import { useAuth } from '../../contexts/AuthContext'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 const ProfileCompletionModal = ({ isOpen, onComplete }) => {
   const { user, checkProfileCompletion } = useAuth()

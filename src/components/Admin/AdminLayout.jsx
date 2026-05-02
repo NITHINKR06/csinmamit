@@ -25,7 +25,7 @@ import {
   ChevronRight,
   Code
 } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 // Determine dev mode: use Vite's flag OR VITE_APP_ENV=development
 const IS_DEV_MODE = (import.meta.env?.DEV === true) || (import.meta.env?.VITE_APP_ENV === 'development')

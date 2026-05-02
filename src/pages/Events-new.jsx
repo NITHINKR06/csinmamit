@@ -7,7 +7,7 @@ import EventsEmpty from '../components/Events/EventsEmpty'
 import EventDetailsModal from '../components/Events/EventDetailsModal'
 import { useEvents } from '../hooks/useEvents'
 import { getEventById } from '../services/eventService'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 const Events = () => {
   const [showFilters, setShowFilters] = useState(false)

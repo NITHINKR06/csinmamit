@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { sanitizePhone } from '../utils/securityUtils'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 /**
  * Custom hook for managing profile data and operations

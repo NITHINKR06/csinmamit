@@ -10,7 +10,7 @@ import {
   deleteEvent, 
   toggleEventPublished 
 } from '../../services/eventService'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 export default function AdminEvents() {
   const [events, setEvents] = useState([])

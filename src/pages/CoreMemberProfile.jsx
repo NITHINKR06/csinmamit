@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { Edit, X } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { updateProfileWithImage, validateProfileData } from '../services/profileService'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 // Components
 import ProfileHeader from '../components/CoreProfile/ProfileHeader'

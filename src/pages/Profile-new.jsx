@@ -7,7 +7,7 @@ import ProfileCard from '../components/Profile/ProfileCard'
 import ProfileForm from '../components/Profile/ProfileForm'
 import MembershipDetails from '../components/Profile/MembershipDetails'
 import QuickActions from '../components/Profile/QuickActions'
-import { Toaster } from 'react-hot-toast'
+
 
 const Profile = () => {
   const { user, loading: authLoading } = useAuth()
@@ -49,14 +49,6 @@ const Profile = () => {
 
   return (
     <>
-      <Toaster
-        position="top-right"
-        containerStyle={{ top: 80 }}
-        toastOptions={{
-          style: { zIndex: 9999 }
-        }}
-      />
-
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {authLoading || profileLoading ? (
           <div className="min-h-[60vh] flex items-center justify-center">

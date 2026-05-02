@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Download, CreditCard, X, Info } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 const QuickActions = () => {
   const [showCertModal, setShowCertModal] = useState(false)

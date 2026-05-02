@@ -8,11 +8,11 @@ const CTA = () => {
 
   return (
     <section className="py-24 relative overflow-hidden" ref={ref}>
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-950 to-gray-900 dark:from-gray-950 dark:to-gray-900" />
+      <div className="absolute inset-0 bg-surface-dark" />
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] opacity-[0.08]"
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] opacity-[0.06]"
         style={{
-          background: 'radial-gradient(circle, rgba(59,130,246,0.6) 0%, transparent 70%)',
+          background: 'radial-gradient(circle at center bottom, rgba(59,130,246,0.8) 0%, transparent 70%)',
         }}
       />
 

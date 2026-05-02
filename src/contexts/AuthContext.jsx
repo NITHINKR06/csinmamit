@@ -11,7 +11,7 @@ import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore'
 import { auth, googleProvider, db } from '../config/firebase'
 import { isNMAMITEmail } from '../utils/secureCoreMembersUtils'
 import { isCoreMember as checkCoreMember, getRoleByEmail as fetchRoleByEmail, hasPermission } from '../services/coreMemberService'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 const AuthContext = createContext({})
 

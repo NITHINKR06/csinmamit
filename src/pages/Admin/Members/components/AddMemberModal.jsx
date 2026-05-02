@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { validateMemberForm } from '../utils/helpers'
 import { YEAR_OPTIONS, MEMBERSHIP_PLANS, PAYMENT_STATUS_OPTIONS } from '../utils/constants'
 

@@ -14,7 +14,7 @@ import {
   Eye,
   Clock
 } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import OTPModal from './components/OTPModal'
 import PaymentDetailsModal from './components/PaymentDetailsModal'
 import { paymentService } from './services/paymentDataService'

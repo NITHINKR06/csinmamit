@@ -18,7 +18,7 @@ import {
   deleteDoc,
 } from 'firebase/firestore'
 import { db } from '../../config/firebase'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 // Constants
 const USERS_PER_PAGE = 20

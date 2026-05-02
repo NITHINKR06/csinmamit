@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../config/firebase'
 import { useAuth } from '../contexts/AuthContext'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 /**
  * Custom hook for managing profile data with Firestore

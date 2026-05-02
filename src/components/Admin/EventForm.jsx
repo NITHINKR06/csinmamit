@@ -18,7 +18,7 @@ import {
 } from 'lucide-react'
 import { uploadToCloudinary } from '../../services/eventService'
 import { isCloudinaryConfigured, getCloudinaryStatus } from '../../config/cloudinary'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 const EventForm = ({ event, onSubmit, onCancel, loading }) => {
   const [formData, setFormData] = useState({

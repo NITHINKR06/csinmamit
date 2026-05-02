@@ -7,7 +7,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { formatEventDate } from '../../utils/eventUtils'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import {
   doc, collection, addDoc, query, where, getDocs,
   updateDoc, serverTimestamp, getDoc, arrayUnion

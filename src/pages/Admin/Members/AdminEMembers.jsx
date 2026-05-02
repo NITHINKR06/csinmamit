@@ -14,7 +14,7 @@ import {
   Timestamp
 } from 'firebase/firestore'
 import { db, auth } from '../../../config/firebase'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 // Component imports
 import SearchBar from './components/SearchBar'

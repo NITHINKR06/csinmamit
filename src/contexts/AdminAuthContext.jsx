@@ -14,7 +14,7 @@ import {
   serverTimestamp as firebaseServerTimestamp,
   collection as firebaseCollection
 } from 'firebase/firestore'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import firestoreFallback from '../utils/firestoreFallback'
 
 const IS_DEV_MODE = (import.meta.env?.DEV === true) || (import.meta.env?.VITE_APP_ENV === 'development')

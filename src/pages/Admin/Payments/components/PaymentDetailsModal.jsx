@@ -19,7 +19,7 @@ import {
   GraduationCap,
   FileText
 } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 export default function PaymentDetailsModal({ payment, isOpen, onClose }) {
   if (!isOpen || !payment) return null

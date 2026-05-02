@@ -36,7 +36,7 @@ const Features = () => {
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 })
 
   return (
-    <section className="py-28 relative bg-gray-50 dark:bg-gray-900/50" ref={ref}>
+    <section className="py-28 relative bg-surface-warm dark:bg-gray-900/50" ref={ref}>
       <div className="container-custom">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -82,28 +82,6 @@ const Features = () => {
           ))}
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-16"
-        >
-          {[
-            { value: '30+', label: 'Workshops', sub: 'Hands-on sessions' },
-            { value: '10+', label: 'Hackathons', sub: 'Coding battles' },
-            { value: '20+', label: 'Lectures', sub: 'Industry talks' },
-            { value: '15+', label: 'Projects', sub: 'Student showcases' },
-          ].map(({ value, label, sub }) => (
-            <div
-              key={label}
-              className="p-5 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-800"
-            >
-              <div className="text-2xl font-bold font-display text-gray-900 dark:text-white">{value}</div>
-              <div className="text-sm font-semibold text-gray-700 dark:text-gray-300 mt-1">{label}</div>
-              <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{sub}</div>
-            </div>
-          ))}
-        </motion.div>
       </div>
     </section>
   )

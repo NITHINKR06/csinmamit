@@ -26,7 +26,7 @@ const Navbar = () => {
     let ticking = false
     const onScroll = () => {
       if (!ticking) {
-        requestAnimationFrame(() => { setScrolled(window.scrollY > 20); ticking = false })
+        requestAnimationFrame(() => { setScrolled(window.scrollY > 70); ticking = false })
         ticking = true
       }
     }
@@ -58,10 +58,10 @@ const Navbar = () => {
     <>
       {/* ── Main nav bar ─────────────────────────────────────────────────── */}
       <nav
-        className={`fixed top-0 inset-x-0 z-50 transition-all duration-500
+        className={`fixed inset-x-0 z-50 transition-all duration-500
           ${scrolled
-            ? 'bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800/80 shadow-sm'
-            : 'bg-transparent'
+            ? 'top-4 mx-4 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border border-gray-100/80 dark:border-gray-800 rounded-2xl shadow-lg shadow-black/5 dark:shadow-black/20'
+            : 'top-0 bg-transparent'
           }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -266,7 +266,7 @@ const Navbar = () => {
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] }}
+            transition={{ type: 'spring', stiffness: 350, damping: 30 }}
             className="fixed top-0 right-0 bottom-0 w-72 z-50 lg:hidden overflow-y-auto
                        bg-white dark:bg-gray-950 border-l border-gray-100 dark:border-gray-800 shadow-2xl"
           >
