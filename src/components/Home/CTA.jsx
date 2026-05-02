@@ -10,7 +10,7 @@ const CTA = () => {
     <section className="py-24 relative overflow-hidden" ref={ref}>
       <div className="absolute inset-0 bg-surface-dark" />
       <div
-        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] opacity-[0.06]"
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] opacity-[0.04]"
         style={{
           background: 'radial-gradient(circle at center bottom, rgba(59,130,246,0.8) 0%, transparent 70%)',
         }}
@@ -23,9 +23,16 @@ const CTA = () => {
           transition={{ duration: 0.6 }}
           className="max-w-3xl mx-auto text-center"
         >
+          <div className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 
+                          rounded-full border border-white/10 bg-white/5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-none" />
+            <span className="text-[11px] font-medium tracking-widest uppercase text-gray-400">
+              2025–26 Applications Open
+            </span>
+          </div>
+
           <h2 className="heading-2 mb-4 text-white">
-            Ready to Join the{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-cyber-blue">Tech Revolution?</span>
+            Ready to Join the Tech Revolution?
           </h2>
 
           <p className="text-lg text-gray-400 mb-10 max-w-2xl mx-auto">
@@ -47,10 +54,6 @@ const CTA = () => {
               Explore Events
             </Link>
           </div>
-
-          <p className="mt-8 text-sm text-gray-500">
-            Membership registration for 2025-26 is now open!
-          </p>
         </motion.div>
       </div>
     </section>

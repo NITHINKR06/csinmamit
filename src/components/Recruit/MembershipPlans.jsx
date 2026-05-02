@@ -11,7 +11,7 @@ const MembershipPlans = ({ selectedPlan, setSelectedPlan }) => {
         className="text-center mb-12"
       >
         <h2 className="text-3xl md:text-4xl font-bold mb-4">
-          Select Your <span className="gradient-text">Membership Duration</span>
+          Select Your Membership Duration
         </h2>
         <p className="text-gray-400 text-lg">Choose the plan that works best for you</p>
       </motion.div>

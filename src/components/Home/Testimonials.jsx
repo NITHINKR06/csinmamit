@@ -63,7 +63,7 @@ const Testimonials = () => {
           className="text-center mb-12"
         >
           <h2 className="heading-2 mb-3">
-            Voices of our <span className="gradient-text">Community</span>
+            Voices of our Community
           </h2>
           <p className="body-text max-w-2xl mx-auto">
             Honest words from members and alumni who grew with CSI NMAMIT.

@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion'
-import Tilt from 'react-parallax-tilt'
-import { Linkedin, Github, Star } from 'lucide-react'
+import { Linkedin, Github } from 'lucide-react'
 
 const StudentCard = ({ member, index, onClick }) => {
   const displayRole = member?.roleDetails?.position || member?.role || 'Member'
@@ -10,83 +9,56 @@ const StudentCard = ({ member, index, onClick }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05, duration: 0.4 }}
       onClick={() => onClick(member)}
-      className="cursor-pointer"
+      className="cursor-pointer group"
     >
-      <Tilt tiltMaxAngleX={5} tiltMaxAngleY={5} perspective={1000} scale={1.01}>
-        <div className="relative rounded-xl overflow-hidden shadow-md group bg-black">
-          
-          {/* Full Image */}
-          <img
-            src={member.imageSrc}
-            alt={member.name}
-            className="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-500"
-          />
+      <div className="relative rounded-2xl overflow-hidden aspect-[3/4] bg-black
+                      ring-1 ring-black/5 dark:ring-white/5
+                      hover:ring-primary-500/30 transition-all duration-300">
+        
+        <img
+          src={member.imageSrc}
+          alt={member.name}
+          className="w-full h-full object-cover group-hover:scale-[1.04] 
+                     transition-transform duration-500"
+        />
 
-          {/* Bottom Gradient with Name + USN + Role */}
-          <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/100 via-black/80 to-transparent">
-            <h3 className="text-lg font-bold text-white">{member.name}</h3>
-            {member.usn && (
-              <p className="text-xs text-gray-400 uppercase tracking-wider">{member.usn}</p>
+        {/* Always visible bottom strip */}
+        <div className="absolute bottom-0 inset-x-0 p-4 
+                        bg-gradient-to-t from-black/90 via-black/60 to-transparent">
+          <h3 className="text-sm font-semibold text-white leading-snug">{member.name}</h3>
+          <p className="text-xs text-yellow-400 font-medium mt-0.5">{displayRole}</p>
+        </div>
+
+        {/* Hover reveal — social links only */}
+        <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100
+                        transition-opacity duration-300 flex items-end justify-end p-4">
+          <div className="flex gap-2">
+            {member.linkedin && member.linkedin !== '#' && (
+              <a href={member.linkedin} target="_blank" onClick={(e) => e.stopPropagation()}
+                 className="p-2 rounded-lg bg-white/10 hover:bg-white/20 
+                            border border-white/10 transition-colors">
+                <Linkedin size={16} className="text-white" />
+              </a>
             )}
-            <p className="text-sm text-yellow-400 font-medium mt-1">{displayRole}</p>
-          </div>
-
-          {/* President Badge */}
-          {displayRole === 'President' && (
-            <div className="absolute top-4 right-4 bg-yellow-400 p-2 rounded-full shadow-md">
-              <Star className="text-white fill-white" size={18} />
-            </div>
-          )}
-
-          {/* Hover Overlay (Fade In) */}
-          <div className="absolute inset-0 bg-black/85 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center text-center p-5">
-            
-            {/* Name and USN in hover */}
-            <h3 className="text-xl font-bold text-white mb-1">{member.name}</h3>
-            {member.usn && (
-              <p className="text-sm text-gray-400 uppercase tracking-wider mb-2">{member.usn}</p>
+            {member.github && member.github !== '#' && (
+              <a href={member.github} target="_blank" onClick={(e) => e.stopPropagation()}
+                 className="p-2 rounded-lg bg-white/10 hover:bg-white/20 
+                            border border-white/10 transition-colors">
+                <Github size={16} className="text-white" />
+              </a>
             )}
-            <p className="text-sm text-yellow-400 font-medium mb-3">{displayRole}</p>
-            
-            {/* Branch + Year */}
-            {(member.branch || member.year) && (
-              <div className="text-sm text-gray-300 mb-3">
-                {member.branch && <span>{member.branch}</span>}
-                {member.branch && member.year && <span> • </span>}
-                {member.year && <span>{member.year}</span>}
-              </div>
-            )}
-
-            {/* Socials */}
-            <div className="flex gap-4">
-              {member.linkedin && member.linkedin !== '#' && (
-                <a
-                  href={member.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  className="p-2 rounded-full bg-white/10 hover:bg-indigo-500/30 transition-colors"
-                  title="LinkedIn Profile"
-                >
-                  <Linkedin size={20} className="text-white" />
-                </a>
-              )}
-              {member.github && member.github !== '#' && (
-                <a
-                  href={member.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  className="p-2 rounded-full bg-white/10 hover:bg-purple-500/30 transition-colors"
-                  title="GitHub Profile"
-                >
-                  <Github size={20} className="text-white" />
-                </a>
-              )}
-            </div>
           </div>
         </div>
-      </Tilt>
+
+        {displayRole === 'President' && (
+          <div className="absolute top-3 left-3 px-2 py-1 rounded-md 
+                          bg-yellow-400/90 backdrop-blur-sm">
+            <span className="text-[10px] font-bold text-yellow-900 tracking-wide uppercase">
+              President
+            </span>
+          </div>
+        )}
+      </div>
     </motion.div>
   )
 }

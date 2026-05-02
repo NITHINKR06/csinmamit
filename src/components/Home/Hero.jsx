@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { ArrowRight, Sparkles, Users, Calendar, Award } from 'lucide-react'
+import { ArrowRight, Sparkles } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 
 const FloatingTagRing = () => {
@@ -20,7 +20,10 @@ const FloatingTagRing = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: [0.4, 0.7, 0.4] }}
               transition={{ duration: 4 + i * 0.5, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute text-[11px] font-mono font-medium text-gray-400 dark:text-gray-600 tracking-wider"
+              className="absolute text-[10px] font-semibold tracking-[0.1em] uppercase
+                         px-3 py-1 rounded-full border border-gray-200 dark:border-gray-700
+                         bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm
+                         text-gray-400 dark:text-gray-500"
               style={{ left: `calc(50% + ${x}px)`, top: `calc(50% + ${y}px)`, transform: 'translate(-50%, -50%)' }}
             >
               {tag}
@@ -30,32 +33,6 @@ const FloatingTagRing = () => {
       </div>
     </div>
   )
-}
-
-const NoiseCanvas = () => {
-  const ref = useRef(null)
-  useEffect(() => {
-    const canvas = ref.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    let id
-    const render = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
-      const w = canvas.width, h = canvas.height
-      const imgData = ctx.createImageData(w, h)
-      const d = imgData.data
-      for (let i = 0; i < d.length; i += 4) {
-        const v = Math.random() * 30
-        d[i] = v; d[i+1] = v; d[i+2] = v; d[i+3] = 12
-      }
-      ctx.putImageData(imgData, 0, 0)
-      id = requestAnimationFrame(render)
-    }
-    id = requestAnimationFrame(render)
-    return () => cancelAnimationFrame(id)
-  }, [])
-  return <canvas ref={ref} className="absolute inset-0 pointer-events-none z-[1]" />
 }
 
 const CountUp = ({ end, suffix = '', duration = 1000 }) => {
@@ -113,7 +90,16 @@ const Hero = () => {
           backgroundSize: '32px 32px',
         }}
       />
-      <NoiseCanvas />
+      
+      {/* Static Noise Overlay */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none z-[1] opacity-[0.04]">
+        <filter id="noise">
+          <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
+          <feColorMatrix type="saturate" values="0"/>
+        </filter>
+        <rect width="100%" height="100%" filter="url(#noise)" />
+      </svg>
+
       <FloatingTagRing />
 
       <div
@@ -185,23 +171,25 @@ const Hero = () => {
           )}
         </motion.div>
 
+        {/* New Stats Strip */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.36 }}
-          className="mt-16 grid grid-cols-3 gap-8 max-w-lg mx-auto"
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="mt-14 inline-flex divide-x divide-gray-200 dark:divide-gray-800
+                     border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden
+                     bg-white/60 dark:bg-white/[0.03] backdrop-blur-sm"
         >
           {[
-            { icon: Users, end: 500, suffix: '+', label: 'Active Members' },
-            { icon: Calendar, end: 50, suffix: '+', label: 'Annual Events' },
-            { icon: Award, end: 20, suffix: '+', label: 'Awards Won' },
-          ].map(({ icon: Icon, end, suffix, label }) => (
-            <div key={label} className="text-center">
-              <Icon size={18} className="mx-auto mb-2 text-gray-400 dark:text-gray-500" />
-              <div className="text-2xl font-bold font-display text-gray-900 dark:text-white">
-                <CountUp end={end} suffix={suffix} />
-              </div>
-              <div className="text-xs text-gray-500 dark:text-gray-500 mt-0.5">{label}</div>
+            { end: 500, suffix: '+', label: 'Members' },
+            { end: 50,  suffix: '+', label: 'Events / yr' },
+            { end: 20,  suffix: '+', label: 'Awards' },
+          ].map((s) => (
+            <div key={s.label} className="px-7 py-4 text-center">
+              <p className="text-2xl font-bold font-display text-gray-900 dark:text-white">
+                <CountUp end={s.end} suffix={s.suffix} />
+              </p>
+              <p className="text-[11px] text-gray-500 tracking-widest uppercase mt-0.5">{s.label}</p>
             </div>
           ))}
         </motion.div>

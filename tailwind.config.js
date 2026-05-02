@@ -59,9 +59,16 @@ export default {
           green: '#22d3ee',
         },
         surface: {
-          warm: '#fefef7',
-          dark: '#060818',
+          warm: '#fafaf9',
+          section: '#f4f4f5',
+          dark: '#09090b',
+          'dark-2': '#111113',
         }
+      },
+      spacing: {
+        '18': '4.5rem',
+        '22': '5.5rem',
+        '26': '6.5rem',
       },
       fontSize: {
         'display-xl': ['3.5rem', { lineHeight: '1.05', letterSpacing: '-0.04em' }],

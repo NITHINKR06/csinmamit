@@ -26,7 +26,7 @@ const Navbar = () => {
     let ticking = false
     const onScroll = () => {
       if (!ticking) {
-        requestAnimationFrame(() => { setScrolled(window.scrollY > 70); ticking = false })
+        requestAnimationFrame(() => { setScrolled(window.scrollY > 24); ticking = false })
         ticking = true
       }
     }
@@ -71,10 +71,9 @@ const Navbar = () => {
             <Link to="/" className="flex items-center gap-3 group shrink-0">
               <div className="relative">
                 <img src="/csi-logo.png" alt="CSI" className="h-9 w-9 lg:h-10 lg:w-10 transition-all duration-300" />
-                <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md bg-cyber-blue/30" />
               </div>
               <div className="hidden sm:block">
-                <p className="text-base lg:text-[17px] font-bold gradient-text-animated leading-none">CSI NMAMIT</p>
+                <p className="text-base lg:text-[17px] font-bold text-gray-900 dark:text-white leading-none">CSI NMAMIT</p>
                 <p className="text-[10px] text-gray-500 dark:text-gray-500 leading-none mt-0.5 tracking-wide">Computer Society of India</p>
               </div>
             </Link>

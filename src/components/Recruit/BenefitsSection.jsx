@@ -18,7 +18,7 @@ const BenefitsSection = () => {
         transition={{ delay: 0.2 }}
       >
         <h2 className="text-4xl font-bold mb-12 text-center">
-          Why Join <span className="gradient-text">CSI NMAMIT?</span>
+          Why Join CSI NMAMIT?
         </h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {membershipBenefits.map((benefit, index) => {

@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { Award, Target, Lightbulb, Users2 } from 'lucide-react'
+import { Award } from 'lucide-react'
 
 const StatCounter = ({ end, suffix = '', duration = 2000 }) => {
   const [count, setCount] = useState(0)
@@ -35,14 +35,14 @@ const About = () => {
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 })
 
   const stats = [
-    { icon: Users2, value: 500, suffix: '+', label: 'Active Members' },
-    { icon: Award, value: 10, suffix: '+', label: 'Years of Excellence' },
-    { icon: Target, value: 50, suffix: '+', label: 'Events Conducted' },
-    { icon: Lightbulb, value: 100, suffix: '+', label: 'Projects Launched' },
+    { value: 500, suffix: '+', label: 'Active Members' },
+    { value: 10, suffix: '+', label: 'Years of Excellence' },
+    { value: 50, suffix: '+', label: 'Events Conducted' },
+    { value: 100, suffix: '+', label: 'Projects Launched' },
   ]
 
   return (
-    <section className="py-20 relative" ref={ref}>
+    <section className="py-20 relative bg-zinc-50 dark:bg-zinc-900/30" ref={ref}>
       <div className="container-custom">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -50,8 +50,8 @@ const About = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="heading-2 mb-4">
-            About <span className="gradient-text">CSI NMAMIT</span>
+          <h2 className="heading-2 mb-4 text-gray-900 dark:text-white">
+            About CSI NMAMIT
           </h2>
           <p className="body-text max-w-3xl mx-auto">
             We are not just an organization; we are a family that fosters growth, innovation,
@@ -70,9 +70,8 @@ const About = () => {
               Excellence in Technology Education
             </div>
 
-            <h3 className="text-2xl md:text-3xl font-semibold mb-4">
-              Transforming Students into{' '}
-              <span className="gradient-text">Tech Leaders</span>
+            <h3 className="text-2xl md:text-3xl font-semibold mb-4 text-gray-900 dark:text-white">
+              Transforming Students into Tech Leaders
             </h3>
 
             <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">
@@ -120,27 +119,26 @@ const About = () => {
           </motion.div>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map(({ icon: Icon, value, suffix, label }, i) => (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          {stats.map(({ value, suffix, label }, i) => (
             <motion.div
               key={label}
               initial={{ opacity: 0, y: 20 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.1 * i }}
-              className="p-5 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-800 text-center"
+              className="p-6 rounded-2xl bg-white dark:bg-gray-900 
+                         border border-gray-100 dark:border-gray-800 
+                         hover:border-primary-200 dark:hover:border-primary-900
+                         transition-colors duration-300 text-center"
             >
-              <Icon size={20} className="mx-auto mb-2 text-primary-500" />
-              <div className="text-2xl font-bold font-display text-gray-900 dark:text-white">
+              <p className="text-3xl font-bold font-display text-gray-900 dark:text-white mb-1">
                 <StatCounter end={value} suffix={suffix} />
-              </div>
-              <div className="text-xs text-gray-500 dark:text-gray-500 mt-0.5">{label}</div>
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-500 tracking-wide uppercase">{label}</p>
             </motion.div>
           ))}
         </div>
       </div>
-
-      <div className="absolute top-1/2 left-0 w-96 h-96 bg-gradient-to-r from-primary-500/5 to-cyber-blue/5 rounded-full blur-3xl -translate-y-1/2 -translate-x-1/2 pointer-events-none" />
-      <div className="absolute top-1/2 right-0 w-96 h-96 bg-gradient-to-r from-cyber-purple/5 to-cyber-pink/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
     </section>
   )
 }

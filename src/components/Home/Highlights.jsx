@@ -126,8 +126,8 @@ const Highlights = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="heading-2 mb-4">
-            Event <span className="gradient-text">Highlights</span>
+          <h2 className="heading-2 mb-4 text-gray-900 dark:text-white">
+            Event Highlights
           </h2>
           <p className="body-text max-w-3xl mx-auto">
             Glimpses of our successful events, workshops, and activities that showcase 
@@ -136,7 +136,7 @@ const Highlights = () => {
         </motion.div>
 
         {/* Gallery Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 auto-rows-[220px]">
           {highlights.map((item, index) => (
             <motion.div
               key={item.id}
@@ -144,37 +144,36 @@ const Highlights = () => {
               animate={inView ? { opacity: 1, scale: 1 } : {}}
               transition={{ duration: 0.5, delay: index * 0.05 }}
               whileHover={{ y: -5 }}
-              className="group cursor-pointer"
+              className={`relative overflow-hidden rounded-xl cursor-pointer group
+                         ${index === 0 ? 'md:col-span-2 md:row-span-1' : ''}`}
               onClick={() => openLightbox(index)}
             >
-              <div className="relative overflow-hidden rounded-xl glass-card">
-                <div className="aspect-w-16 aspect-h-12 relative h-64">
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  
-                  {/* Overlay Content */}
-                  <div className="absolute bottom-0 left-0 right-0 p-4 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                    <h3 className="text-lg font-bold mb-2">{item.title}</h3>
-                    <div className="flex items-center gap-4 text-sm">
-                      <span className="flex items-center gap-1">
-                        <Calendar size={14} />
-                        {item.date}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Users size={14} />
-                        {item.participants}
-                      </span>
-                    </div>
+              <div className="relative w-full h-full overflow-hidden">
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                
+                {/* Overlay Content */}
+                <div className="absolute bottom-0 left-0 right-0 p-4 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                  <h3 className="text-lg font-bold mb-2">{item.title}</h3>
+                  <div className="flex items-center gap-4 text-sm">
+                    <span className="flex items-center gap-1">
+                      <Calendar size={14} />
+                      {item.date}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Users size={14} />
+                      {item.participants}
+                    </span>
                   </div>
+                </div>
 
-                  {/* Expand Icon */}
-                  <div className="absolute top-4 right-4 p-2 rounded-lg bg-white/20 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <Maximize2 size={20} className="text-white" />
-                  </div>
+                {/* Expand Icon */}
+                <div className="absolute top-4 right-4 p-2 rounded-lg bg-white/20 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <Maximize2 size={20} className="text-white" />
                 </div>
               </div>
             </motion.div>

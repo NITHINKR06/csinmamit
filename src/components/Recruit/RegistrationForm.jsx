@@ -23,7 +23,7 @@ const RegistrationForm = ({
         {/* Header */}
         <div className="text-center mb-8">
           <h2 className="text-4xl font-bold mb-3">
-            Complete Your <span className="gradient-text">Registration</span>
+            Complete Your Registration
           </h2>
           <p className="text-gray-400">Fill in your details to join CSI NMAMIT</p>
         </div>
