@@ -1,113 +1,208 @@
+import { useRef, useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { TypeAnimation } from 'react-type-animation'
 import { Link } from 'react-router-dom'
-import { ArrowRight, Sparkles, Code, Users, Trophy, Zap } from 'lucide-react'
+import { ArrowRight, Sparkles, Users, Calendar, Award } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
+
+const FloatingTagRing = () => {
+  const tags = ['React', 'Python', 'AI/ML', 'Cloud', 'Cyber Sec', 'IoT', 'Web3', 'DevOps']
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] md:w-[700px] md:h-[700px]">
+        {tags.map((tag, i) => {
+          const angle = (i / tags.length) * Math.PI * 2
+          const r = 200
+          const x = Math.cos(angle) * r
+          const y = Math.sin(angle) * r
+          return (
+            <motion.span
+              key={tag}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0.4, 0.7, 0.4] }}
+              transition={{ duration: 4 + i * 0.5, repeat: Infinity, ease: 'easeInOut' }}
+              className="absolute text-[11px] font-mono font-medium text-gray-400 dark:text-gray-600 tracking-wider"
+              style={{ left: `calc(50% + ${x}px)`, top: `calc(50% + ${y}px)`, transform: 'translate(-50%, -50%)' }}
+            >
+              {tag}
+            </motion.span>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+const NoiseCanvas = () => {
+  const ref = useRef(null)
+  useEffect(() => {
+    const canvas = ref.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    let id
+    const render = () => {
+      canvas.width = window.innerWidth
+      canvas.height = window.innerHeight
+      const w = canvas.width, h = canvas.height
+      const imgData = ctx.createImageData(w, h)
+      const d = imgData.data
+      for (let i = 0; i < d.length; i += 4) {
+        const v = Math.random() * 30
+        d[i] = v; d[i+1] = v; d[i+2] = v; d[i+3] = 12
+      }
+      ctx.putImageData(imgData, 0, 0)
+      id = requestAnimationFrame(render)
+    }
+    id = requestAnimationFrame(render)
+    return () => cancelAnimationFrame(id)
+  }, [])
+  return <canvas ref={ref} className="absolute inset-0 pointer-events-none z-[1]" />
+}
+
+const CountUp = ({ end, suffix = '', duration = 2000 }) => {
+  const [count, setCount] = useState(0)
+  const ref = useRef(null)
+  const [inView, setInView] = useState(false)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const obs = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { setInView(true); obs.disconnect() } }, { threshold: 0.3 })
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (!inView) return
+    let start = 0
+    const step = Math.ceil(end / (duration / 16))
+    const timer = setInterval(() => {
+      start += step
+      if (start >= end) { setCount(end); clearInterval(timer) }
+      else setCount(start)
+    }, 16)
+    return () => clearInterval(timer)
+  }, [inView, end, duration])
+
+  return <span ref={ref} className="font-display">{count}{suffix}</span>
+}
 
 const Hero = () => {
   const { user, signInWithGoogle, authLoading } = useAuth()
+  const [scrollY, setScrollY] = useState(0)
 
-  const floatingIcons = [
-    { Icon: Code, delay: 0, x: -200, y: -100 },
-    { Icon: Users, delay: 0.2, x: 200, y: -150 },
-    { Icon: Trophy, delay: 0.4, x: -250, y: 100 },
-    { Icon: Zap, delay: 0.6, x: 250, y: 50 },
-  ]
+  useEffect(() => {
+    const onScroll = () => setScrollY(window.scrollY)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  const parallaxY = scrollY * 0.35
 
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-20 pb-10 overflow-hidden">
-      {/* Background layers */}
-      <div className="absolute inset-0 animated-bg opacity-10" />
-      <div className="absolute inset-0 cyber-grid opacity-20 dark:opacity-10" />
+      <div
+        className="absolute inset-0 opacity-[0.07] dark:opacity-[0.04]"
+        style={{
+          backgroundImage: 'radial-gradient(circle at 25% 30%, rgba(59,130,246,0.4) 0%, transparent 50%), radial-gradient(circle at 75% 70%, rgba(168,85,247,0.3) 0%, transparent 50%), radial-gradient(circle at 50% 50%, rgba(0,212,255,0.2) 0%, transparent 50%)',
+        }}
+      />
+      <div
+        className="absolute inset-0 opacity-[0.04] dark:opacity-[0.02]"
+        style={{
+          backgroundImage: 'radial-gradient(circle, rgba(59,130,246,0.5) 1px, transparent 1px)',
+          backgroundSize: '32px 32px',
+        }}
+      />
+      <NoiseCanvas />
+      <FloatingTagRing />
 
-      {/* Floating Icons */}
-      {floatingIcons.map(({ Icon, delay, x, y }, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, x: 0, y: 0 }}
-          animate={{ opacity: [0.1, 0.3, 0.1], x: [0, x, 0], y: [0, y, 0] }}
-          transition={{ duration: 20, delay, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute hidden lg:block"
-          style={{ left: '50%', top: '50%' }}
-        >
-          <Icon size={40} className="text-primary-500/20" />
-        </motion.div>
-      ))}
-
-      <div className="container-custom relative z-10 text-center max-w-4xl mx-auto">
-        {/* Badge */}
+      <div
+        className="container-custom relative z-10 text-center max-w-4xl mx-auto"
+        style={{ transform: `translateY(${parallaxY}px)` }}
+      >
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="inline-flex items-center space-x-2 px-4 py-2 rounded-full glass-card mb-8"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 mb-8"
         >
-          <Sparkles size={16} className="text-cyber-blue" />
-          <span className="text-sm font-medium">CSI NMAMIT is now public!</span>
+          <Sparkles size={14} className="text-primary-500" />
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">CSI NMAMIT is now public!</span>
         </motion.div>
 
-        {/* Heading */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="heading-1 mb-6"
+          className="font-bold mb-6 leading-tight tracking-tight"
+          style={{ fontSize: 'clamp(2.6rem, 7vw, 5.5rem)' }}
         >
           {user ? (
-            <>Welcome back, <span className="gradient-text-animated">{user.name}</span></>
+            <>Welcome back, <span className="gradient-text">{user.name}</span></>
           ) : (
-            <>Welcome to <span className="gradient-text-animated">CSI NMAMIT</span></>
+            <>Where Innovation Meets <span className="gradient-text">Technology</span></>
           )}
         </motion.h1>
 
-        {/* Subtitle */}
-        <motion.div
+        <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-xl md:text-2xl lg:text-3xl text-gray-700 dark:text-gray-300 mb-10"
+          className="text-lg md:text-xl text-gray-500 dark:text-gray-400 mb-10 max-w-2xl mx-auto"
         >
-          <TypeAnimation
-            sequence={[
-              'Computer Society of India',
-              2000,
-              'Where Innovation Meets Technology',
-              2000,
-              'Building Tomorrow\'s Tech Leaders',
-              2000,
-            ]}
-            wrapper="span"
-            speed={50}
-            repeat={Infinity}
-          />
-        </motion.div>
+          Computer Society of India — NMAMIT chapter. Building tomorrow's tech leaders through hands-on workshops, hackathons, and innovation.
+        </motion.p>
 
-        {/* CTA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="flex justify-center"
+          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
         >
           {user ? (
-            <Link to="/events" className="btn-primary group flex">
+            <Link to="/events" className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-semibold hover:bg-gray-700 dark:hover:bg-gray-100 transition-all duration-200 translate-y-0 hover:-translate-y-[1px]">
               <span>Explore Events</span>
-              <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight size={18} />
             </Link>
           ) : (
-            <button
-              onClick={signInWithGoogle}
-              disabled={authLoading}
-              className="btn-primary group flex"
-            >
-              <span>{authLoading ? 'Signing in...' : 'Get Started'}</span>
-              <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />
-            </button>
+            <>
+              <button
+                onClick={signInWithGoogle}
+                disabled={authLoading}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-semibold hover:bg-gray-700 dark:hover:bg-gray-100 transition-all duration-200 translate-y-0 hover:-translate-y-[1px]"
+              >
+                <span>{authLoading ? 'Signing in...' : 'Get Started'}</span>
+                <ArrowRight size={18} />
+              </button>
+              <Link to="/events" className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-semibold hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 translate-y-0 hover:-translate-y-[1px]">
+                Browse Events
+              </Link>
+            </>
           )}
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          className="mt-16 grid grid-cols-3 gap-8 max-w-lg mx-auto"
+        >
+          {[
+            { icon: Users, end: 500, suffix: '+', label: 'Active Members' },
+            { icon: Calendar, end: 50, suffix: '+', label: 'Annual Events' },
+            { icon: Award, end: 20, suffix: '+', label: 'Awards Won' },
+          ].map(({ icon: Icon, end, suffix, label }) => (
+            <div key={label} className="text-center">
+              <Icon size={18} className="mx-auto mb-2 text-gray-400 dark:text-gray-500" />
+              <div className="text-2xl font-bold font-display text-gray-900 dark:text-white">
+                <CountUp end={end} suffix={suffix} />
+              </div>
+              <div className="text-xs text-gray-500 dark:text-gray-500 mt-0.5">{label}</div>
+            </div>
+          ))}
         </motion.div>
       </div>
 
-      {/* Bottom gradient fade */}
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white dark:from-gray-950 to-transparent" />
     </section>
   )

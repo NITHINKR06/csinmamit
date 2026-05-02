@@ -72,7 +72,7 @@ const Events = () => {
   return (
     <div className="min-h-screen pt-20">
       {/* Hero Section */}
-      <EventsHero />
+      <EventsHero eventCount={filteredEvents.length} />
 
       {/* Filters Section */}
       <EventsFilter
